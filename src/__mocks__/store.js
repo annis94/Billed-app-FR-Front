@@ -60,7 +60,7 @@ const mockedBills = {
         "type": "Restaurants et bars",
         "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
       }])
-
+ 
   },
   create(bill) {
     return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'})
@@ -82,12 +82,12 @@ const mockedBills = {
       "pct": 20
     })
   },
-}
-
-export default {
+ }
+ 
+ export default {
   bills() {
     return mockedBills
     //return {}
   },
-}
-
+ }             
+ 
