@@ -1,6 +1,7 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
+
 export default class NewBill {
   constructor({ document, onNavigate, store, localStorage }) {
     this.document = document
@@ -15,15 +16,30 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
+
+
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+   
+    // Vérification du type de fichier
+    const fileType = file.type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
+   
+    if (!validTypes.includes(fileType)) {
+      alert("Seuls les fichiers jpg, jpeg et png sont acceptés")
+      e.target.value = "" // Reset input
+      return
+    }
+
+
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
+
 
     this.store
       .bills()
@@ -40,6 +56,8 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
@@ -61,6 +79,7 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
+
   // not need to cover this function by tests
   updateBill = (bill) => {
     if (this.store) {
@@ -74,3 +93,4 @@ export default class NewBill {
     }
   }
 }
+
