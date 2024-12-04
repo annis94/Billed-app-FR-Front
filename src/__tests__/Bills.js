@@ -115,8 +115,11 @@ describe("Bills Component - Initialization", () => {
    describe("UI Interactions", () => {
      // Test pour vérifier si les factures sont bien triées par date de la plus ancienne à la plus récente
      test("Then bills should be ordered from earliest to latest", () => {
+
      // Objectif : Vérifier que les factures sont affichées dans l'ordre chronologique croissant
-       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
+       const dates = screen
+       
+       .getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
        // Fonction de tri en ordre anti-chronologique
        const antiChrono = (a, b) => ((a > b) ? 1 : -1)
        // Trie les dates récupérées
@@ -366,8 +369,13 @@ describe("Bills Component - Initialization", () => {
        document.body.innerHTML = BillsUI({ error: "Erreur 500" })
        const message = screen.getByText(/Erreur 500/)
        expect(message).toBeTruthy()
-     })
+     })     
    })
+
+
+
+
+   
 
 
    /* ---- Tests pour la gestion des dates ---- */

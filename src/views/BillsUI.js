@@ -76,7 +76,11 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody"> <!-- Corps du tableau -->
-${bills?.sort((a, b) => new Date(b.date) < new Date(a.date) ? 1 : -1).map(bill => row(bill))} 
+
+
+          //Tri des factures par date en ordre décroissant (les plus récentes en premier)
+          ${bills?.sort((a, b) => new Date(b.date) < new Date(a.date) ? 1 : -1).map(bill => row(bill))}  
+
 <!-- Les notes de frais sont triées par date décroissante et chaque ligne est générée avec la fonction row -->
           </tbody>
           </table>

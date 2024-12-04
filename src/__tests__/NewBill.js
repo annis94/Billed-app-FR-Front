@@ -46,13 +46,14 @@ describe("Given I am connected as an employee", () => {
         document.body.innerHTML = html;
 
                 // Simule une API avec une réponse réussie pour l'upload de fichier
-        const mockStore = {
-          bills: () => ({
-            create: jest
-              .fn()
-              .mockResolvedValue({ fileUrl: "url", key: "1234" }),
-          }),
-        };
+                const createMock = jest.fn().mockResolvedValue({ fileUrl: "url", key: "1234" });
+                  const updateMock = jest.fn().mockResolvedValue({});
+                  const mockStore = {
+                    bills: () => ({
+                      create: createMock,
+                      update: updateMock
+                    }),
+                  };
 
         const newBill = new NewBill({
           document,
@@ -73,6 +74,8 @@ describe("Given I am connected as an employee", () => {
           },
         });
 
+        await waitFor(() => expect(createMock).toHaveBeenCalled());
+
 
                 // Vérifie que la méthode handleChangeFile est bien appelée
         expect(handleChangeFile).toHaveBeenCalled();
@@ -89,13 +92,12 @@ describe("Given I am connected as an employee", () => {
 
 
                 // Simule une API fictive pour tester le composant
-        const mockStore = {
-          bills: () => ({
-            create: jest
-              .fn()
-              .mockResolvedValue({ fileUrl: "url", key: "1234" }),
-          }),
-        };
+                const mockStore = {
+                  bills: () => ({
+                    create: jest.fn().mockResolvedValue({ fileUrl: "url", key: "1234" }),
+                    update: jest.fn().mockResolvedValue({})
+                  }),
+                };
 
         const newBill = new NewBill({
           document,
@@ -138,6 +140,7 @@ describe("Given I am connected as an employee", () => {
         const mockStore = {
           bills: () => ({
             create: jest.fn().mockRejectedValue(new Error("Erreur API")),
+            update: jest.fn().mockResolvedValue({})
           }),
         };
 
@@ -207,7 +210,7 @@ describe("Given I am connected as an employee", () => {
 
         const createMock = jest
           .fn()
-          .mockResolvedValue({ fileUrl: "url", key: "1234" });
+          .mockResolvedValue({ fileUrl: "url", key: "123" });
         const updateMock = jest.fn().mockResolvedValue({});
         const mockStore = {
           bills: () => ({
@@ -269,6 +272,61 @@ describe("Given I am connected as an employee", () => {
 
           // Résultat attendu : la méthode console.error doit être appelée, signalant que l'erreur de l'API a été capturée
       });
+
+      test("Then the API should receive the correct data for the new bill", async () => {
+        const html = NewBillUI();
+        document.body.innerHTML = html;
+      
+        const createMock = jest.fn().mockResolvedValue({ fileUrl: "url", key: "123" });
+        const updateMock = jest.fn().mockResolvedValue({});
+        const mockStore = {
+          bills: () => ({
+            create: createMock,
+            update: updateMock
+          }),
+        };
+      
+        const onNavigate = jest.fn();
+        const newBill = new NewBill({
+          document,
+          onNavigate,
+          store: mockStore,
+          localStorage: window.localStorage,
+        });
+      
+        // Upload fichier
+        const fileInput = screen.getByTestId("file");
+        fireEvent.change(fileInput, {
+          target: {
+            files: [new File(["test"], "test.jpg", { type: "image/jpeg" })]
+          }
+        });
+      
+        await waitFor(() => {
+          expect(createMock).toHaveBeenCalledWith(expect.objectContaining({
+            data: expect.any(FormData)
+          }));
+        });
+      
+        // Remplir formulaire
+        const form = screen.getByTestId("form-new-bill");
+        fireEvent.change(screen.getByTestId("expense-type"), { target: { value: "Transports" }});
+        fireEvent.change(screen.getByTestId("expense-name"), { target: { value: "Taxi" }});
+        fireEvent.change(screen.getByTestId("amount"), { target: { value: "50" }});
+        fireEvent.change(screen.getByTestId("datepicker"), { target: { value: "2023-12-01" }});
+        fireEvent.change(screen.getByTestId("vat"), { target: { value: "20" }});
+        fireEvent.change(screen.getByTestId("pct"), { target: { value: "10" }});
+        fireEvent.change(screen.getByTestId("commentary"), { target: { value: "Trajet professionnel" }});
+      
+        // Soumettre formulaire
+        fireEvent.submit(form);
+      
+        // Vérifier l'appel à update
+        await waitFor(() => {
+          expect(updateMock).toHaveBeenCalled();
+        });
+      });
+
     });
   });
 });  
